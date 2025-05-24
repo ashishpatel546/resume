@@ -90,6 +90,10 @@
         margin-bottom: 40px;
       }
 
+      .section:last-child {
+        margin-bottom: 20px;
+      }
+
       .section-title {
         font-size: 1.8rem;
         font-weight: 600;
@@ -312,7 +316,7 @@
       .footer {
         background: #2c3e50;
         color: white;
-        padding: 30px;
+        padding: 25px 30px;
         text-align: center;
       }
 
@@ -348,6 +352,7 @@
         font-size: 1rem;
         box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         transition: all 0.3s ease;
+        z-index: 999;
       }
 
       .print-btn:hover {
@@ -367,29 +372,253 @@
         .print-btn {
           display: none;
         }
+        .print-loading {
+          display: none !important;
+        }
       }
 
       @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+        
         .name {
           font-size: 2rem;
         }
+        
+        .title {
+          font-size: 1.1rem;
+        }
+        
         .contact-info {
           flex-direction: column;
           align-items: center;
           gap: 15px;
         }
+        
+        .contact-item {
+          font-size: 0.85rem;
+        }
+        
+        .content {
+          padding: 20px;
+        }
+        
+        .section-title {
+          font-size: 1.5rem;
+        }
+        
+        .summary {
+          font-size: 1rem;
+          padding: 20px;
+        }
+        
         .job-header {
           flex-direction: column;
           gap: 10px;
         }
+        
+        .job-title {
+          font-size: 1.1rem;
+        }
+        
         .skills-grid {
           grid-template-columns: 1fr;
+        }
+        
+        .skill-category {
+          padding: 15px;
+        }
+        
+        .experience-item {
+          padding: 20px;
+        }
+        
+        .project {
+          padding: 15px;
+        }
+        
+        .project-title {
+          font-size: 1rem;
+        }
+        
+        .certifications-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .social-links {
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        
+        .social-link {
+          padding: 8px 12px;
+          font-size: 0.9rem;
+        }
+        
+        .print-btn {
+          bottom: 15px;
+          right: 15px;
+          padding: 12px 16px;
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header {
+          padding: 25px 20px;
+        }
+        
+        .name {
+          font-size: 1.8rem;
+        }
+        
+        .title {
+          font-size: 1rem;
+        }
+        
+        .content {
+          padding: 15px;
+        }
+        
+        .section-title {
+          font-size: 1.3rem;
+        }
+        
+        .skill-category h4 {
+          font-size: 1rem;
+        }
+        
+        .skill-tag {
+          font-size: 0.75rem;
+          padding: 4px 8px;
+        }
+        
+        .tech-tag {
+          font-size: 0.7rem;
+          padding: 3px 8px;
+        }
+      }
+
+      /* Auto-Print Loading Indicator */
+      .print-loading {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+      }
+
+      .print-loading-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px 40px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        min-width: 300px;
+        max-width: 90%;
+      }
+
+      .print-loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .print-loading-text {
+        font-size: 1.1rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 500;
+      }
+
+      .print-loading-subtext {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        line-height: 1.4;
+      }
+
+      .print-progress-bar {
+        width: 100%;
+        height: 6px;
+        background-color: #ecf0f1;
+        border-radius: 3px;
+        margin: 15px 0;
+        overflow: hidden;
+      }
+
+      .print-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        border-radius: 3px;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      @media (max-width: 768px) {
+        .print-loading-content {
+          padding: 20px 25px;
+          min-width: 280px;
+        }
+        
+        .print-loading-text {
+          font-size: 1rem;
+        }
+        
+        .print-loading-subtext {
+          font-size: 0.85rem;
+        }
+      }
+
+      @media print {
+        .print-loading {
+          display: none !important;
         }
       }
     </style>
   </head>
   <body>
-    <button class="print-btn" onclick="window.print()">🖨️ Print Resume</button>
+    <button class="print-btn" onclick="autoPrintResume()">
+      🖨️ Print Resume
+    </button>
+
+    <!-- Auto-Print Loading Indicator -->
+    <div id="printLoading" class="print-loading">
+      <div class="print-loading-content">
+        <div class="print-loading-spinner"></div>
+        <div class="print-loading-text">Preparing Resume for Print</div>
+        <div class="print-loading-subtext>
+          Loading full document and optimizing for print...
+        </div>
+        <div class="print-progress-bar">
+          <div id="printProgressFill" class="print-progress-fill"></div>
+        </div>
+        <div style="font-size: 0.8rem; color: #95a5a6; margin-top: 10px">
+          Please wait while we ensure all content is loaded
+        </div>
+      </div>
+    </div>
 
     <div class="container">
       <header class="header">
@@ -458,7 +687,7 @@
               <h4>⚡ Backend Technologies</h4>
               <div class="skill-tags">
                 <span class="skill-tag">Node.js</span>
-                <span class="skill-tag">Nest.js</span>
+                <span class="skill-tag new">Nest.js</span>
                 <span class="skill-tag">Express.js</span>
                 <span class="skill-tag new">FastAPI</span>
                 <span class="skill-tag">TypeScript</span>
@@ -476,6 +705,7 @@
                 <span class="skill-tag">AWS</span>
                 <span class="skill-tag">Serverless</span>
                 <span class="skill-tag">Kafka</span>
+                <span class="skill-tag">Redis</span>
               </div>
             </div>
             <div class="skill-category">
@@ -497,7 +727,6 @@
                 <span class="skill-tag">Vue.js</span>
                 <span class="skill-tag">HTML5/CSS3</span>
                 <span class="skill-tag">Bootstrap</span>
-                <span class="skill-tag">Git</span>
               </div>
             </div>
             <div class="skill-category">
@@ -509,6 +738,31 @@
                 <span class="skill-tag">JWT</span>
                 <span class="skill-tag">Reveal BI</span>
                 <span class="skill-tag">ETL</span>
+                <span class="skill-tag">Git</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">🌟 Core Competencies</h2>
+          <div class="skills-grid">
+            <div class="skill-category">
+              <h4>Leadership & Management</h4>
+              <div class="skill-tags">
+                <span class="skill-tag">Team Leadership</span>
+                <span class="skill-tag">Project Management</span>
+                <span class="skill-tag">Mentoring</span>
+                <span class="skill-tag">Strategic Planning</span>
+              </div>
+            </div>
+            <div class="skill-category">
+              <h4>Problem Solving</h4>
+              <div class="skill-tags">
+                <span class="skill-tag">Complex Problem Solving</span>
+                <span class="skill-tag">Algorithm Design</span>
+                <span class="skill-tag">Performance Optimization</span>
+                <span class="skill-tag">System Architecture</span>
               </div>
             </div>
           </div>
@@ -1030,29 +1284,7 @@
           </div>
         </section>
 
-        <section class="section">
-          <h2 class="section-title">🌟 Core Competencies</h2>
-          <div class="skills-grid">
-            <div class="skill-category">
-              <h4>Leadership & Management</h4>
-              <div class="skill-tags">
-                <span class="skill-tag">Team Leadership</span>
-                <span class="skill-tag">Project Management</span>
-                <span class="skill-tag">Mentoring</span>
-                <span class="skill-tag">Strategic Planning</span>
-              </div>
-            </div>
-            <div class="skill-category">
-              <h4>Problem Solving</h4>
-              <div class="skill-tags">
-                <span class="skill-tag">Complex Problem Solving</span>
-                <span class="skill-tag">Algorithm Design</span>
-                <span class="skill-tag">Performance Optimization</span>
-                <span class="skill-tag">System Architecture</span>
-              </div>
-            </div>
-          </div>
-        </section>
+     
       </div>
 
       <footer class="footer">
@@ -1152,6 +1384,216 @@
         section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(section);
       });
+
+      // Detect if user is on mobile device
+      function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+               (window.innerWidth <= 768);
+      }
+
+      // Enhanced Auto-Print Resume Function with Mobile Support
+      async function autoPrintResume() {
+        // Show loading indicator
+        const loadingElement = document.getElementById('printLoading');
+        const progressFill = document.getElementById('printProgressFill');
+        loadingElement.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        try {
+          // Step 1: Reset scroll position
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          progressFill.style.width = '10%';
+          await sleep(300);
+
+          // Step 2: Force render all content by triggering reflow
+          document.body.offsetHeight; // Force reflow
+          progressFill.style.width = '20%';
+          await sleep(200);
+
+          // Step 3: Get accurate document dimensions
+          const body = document.body;
+          const html = document.documentElement;
+          const documentHeight = Math.max(
+            body.scrollHeight,
+            body.offsetHeight,
+            html.clientHeight,
+            html.scrollHeight,
+            html.offsetHeight
+          );
+
+          const viewportHeight = window.innerHeight;
+          const isMobile = isMobileDevice();
+          
+          progressFill.style.width = '30%';
+          await sleep(200);
+
+          // Step 4: Enhanced scrolling for mobile and desktop
+          if (isMobile) {
+            // Mobile-specific handling
+            await scrollThroughContentMobile(documentHeight, viewportHeight, progressFill);
+          } else {
+            // Desktop handling
+            await scrollThroughContentDesktop(documentHeight, viewportHeight, progressFill);
+          }
+
+          // Step 5: Ensure all sections are visible and loaded
+          const sections = document.querySelectorAll('.section');
+          for (let i = 0; i < sections.length; i++) {
+            const section = sections[i];
+            section.scrollIntoView({ behavior: 'instant', block: 'center' });
+            await sleep(100);
+            
+            // Update progress (70% to 85% during section loading)
+            const sectionProgress = 70 + (i / sections.length) * 15;
+            progressFill.style.width = sectionProgress + '%';
+          }
+
+          // Step 6: Final scroll to top and ensure everything is rendered
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          progressFill.style.width = '90%';
+          await sleep(300);
+
+          // Step 7: Wait for any lazy-loaded content and images
+          await waitForContentToLoad();
+          progressFill.style.width = '95%';
+          await sleep(200);
+
+          // Step 8: Final preparation
+          await ensureAllContentVisible();
+          progressFill.style.width = '100%';
+          await sleep(300);
+
+          // Step 9: Hide loading and trigger print
+          loadingElement.style.display = 'none';
+          document.body.style.overflow = 'auto';
+
+          // Trigger print with delay to ensure UI update
+          setTimeout(() => {
+            window.print();
+          }, 150);
+
+        } catch (error) {
+          console.error('Error during auto-print preparation:', error);
+          handlePrintError(loadingElement);
+        }
+      }
+
+      // Mobile-specific scrolling function
+      async function scrollThroughContentMobile(documentHeight, viewportHeight, progressFill) {
+        const scrollSteps = Math.max(8, Math.ceil(documentHeight / (viewportHeight * 0.8)));
+        
+        for (let i = 0; i <= scrollSteps; i++) {
+          const scrollPosition = Math.min(
+            (i / scrollSteps) * (documentHeight - viewportHeight),
+            documentHeight - viewportHeight
+          );
+          
+          // Use instant scroll for mobile to avoid animation issues
+          window.scrollTo({ top: scrollPosition, behavior: 'instant' });
+          
+          // Force repaint
+          document.body.offsetHeight;
+          
+          // Update progress (30% to 70% during scrolling)
+          const scrollProgress = 30 + (i / scrollSteps) * 40;
+          progressFill.style.width = scrollProgress + '%';
+          
+          // Longer delay for mobile to ensure content loads
+          await sleep(isMobileDevice() ? 300 : 150);
+        }
+      }
+
+      // Desktop-specific scrolling function
+      async function scrollThroughContentDesktop(documentHeight, viewportHeight, progressFill) {
+        const scrollSteps = Math.ceil(documentHeight / viewportHeight);
+        
+        for (let i = 0; i <= scrollSteps; i++) {
+          const scrollPosition = Math.min(
+            (i / scrollSteps) * (documentHeight - viewportHeight),
+            documentHeight - viewportHeight
+          );
+          
+          window.scrollTo({ top: scrollPosition, behavior: 'instant' });
+          
+          // Update progress (30% to 70% during scrolling)
+          const scrollProgress = 30 + (i / scrollSteps) * 40;
+          progressFill.style.width = scrollProgress + '%';
+          
+          await sleep(200);
+        }
+      }
+
+      // Enhanced content loading function
+      async function waitForContentToLoad() {
+        return new Promise((resolve) => {
+          // Wait for images
+          const images = document.querySelectorAll('img');
+          let loadedImages = 0;
+          const totalImages = images.length;
+
+          if (totalImages === 0) {
+            resolve();
+            return;
+          }
+
+          const checkImageLoad = () => {
+            loadedImages++;
+            if (loadedImages === totalImages) {
+              resolve();
+            }
+          };
+
+          images.forEach((img) => {
+            if (img.complete && img.naturalHeight !== 0) {
+              checkImageLoad();
+            } else {
+              img.addEventListener('load', checkImageLoad);
+              img.addEventListener('error', checkImageLoad);
+            }
+          });
+
+          // Timeout fallback
+          setTimeout(resolve, 2000);
+        });
+      }
+
+      // Ensure all content is visible
+      async function ensureAllContentVisible() {
+        // Force all lazy-loaded content to be visible
+        const lazyElements = document.querySelectorAll('[loading="lazy"]');
+        lazyElements.forEach(element => {
+          element.removeAttribute('loading');
+        });
+
+        // Trigger any remaining animations or transitions
+        const animatedElements = document.querySelectorAll('.section');
+        animatedElements.forEach(element => {
+          element.style.opacity = '1';
+          element.style.transform = 'translateY(0)';
+        });
+
+        // Wait for any remaining renders
+        await sleep(200);
+      }
+
+      // Error handling function
+      function handlePrintError(loadingElement) {
+        loadingElement.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // Show user-friendly message
+        alert('Print preparation encountered an issue. Opening print dialog directly...');
+        
+        // Fallback to direct print
+        setTimeout(() => {
+          window.print();
+        }, 100);
+      }
+
+      // Helper function to create delays
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
     </script>
   </body>
 </html>
