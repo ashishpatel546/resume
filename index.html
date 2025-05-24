@@ -381,81 +381,81 @@
         body {
           padding: 10px;
         }
-        
+
         .name {
           font-size: 2rem;
         }
-        
+
         .title {
           font-size: 1.1rem;
         }
-        
+
         .contact-info {
           flex-direction: column;
           align-items: center;
           gap: 15px;
         }
-        
+
         .contact-item {
           font-size: 0.85rem;
         }
-        
+
         .content {
           padding: 20px;
         }
-        
+
         .section-title {
           font-size: 1.5rem;
         }
-        
+
         .summary {
           font-size: 1rem;
           padding: 20px;
         }
-        
+
         .job-header {
           flex-direction: column;
           gap: 10px;
         }
-        
+
         .job-title {
           font-size: 1.1rem;
         }
-        
+
         .skills-grid {
           grid-template-columns: 1fr;
         }
-        
+
         .skill-category {
           padding: 15px;
         }
-        
+
         .experience-item {
           padding: 20px;
         }
-        
+
         .project {
           padding: 15px;
         }
-        
+
         .project-title {
           font-size: 1rem;
         }
-        
+
         .certifications-grid {
           grid-template-columns: 1fr;
         }
-        
+
         .social-links {
           flex-wrap: wrap;
           gap: 10px;
         }
-        
+
         .social-link {
           padding: 8px 12px;
           font-size: 0.9rem;
         }
-        
+
         .print-btn {
           bottom: 15px;
           right: 15px;
@@ -468,32 +468,32 @@
         .header {
           padding: 25px 20px;
         }
-        
+
         .name {
           font-size: 1.8rem;
         }
-        
+
         .title {
           font-size: 1rem;
         }
-        
+
         .content {
           padding: 15px;
         }
-        
+
         .section-title {
           font-size: 1.3rem;
         }
-        
+
         .skill-category h4 {
           font-size: 1rem;
         }
-        
+
         .skill-tag {
           font-size: 0.75rem;
           padding: 4px 8px;
         }
-        
+
         .tech-tag {
           font-size: 0.7rem;
           padding: 3px 8px;
@@ -581,11 +581,11 @@
           padding: 20px 25px;
           min-width: 280px;
         }
-        
+
         .print-loading-text {
           font-size: 1rem;
         }
-        
+
         .print-loading-subtext {
           font-size: 0.85rem;
         }
@@ -1283,8 +1283,6 @@
             </div>
           </div>
         </section>
-
-     
       </div>
 
       <footer class="footer">
@@ -1362,10 +1360,22 @@
         });
       });
 
-      // Add animation on scroll
+      // Detect if user is on mobile device
+      function isMobileDevice() {
+        return (
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          ) || window.innerWidth <= 768
+        );
+      }
+
+      // Improved mobile detection and observer setup
+      const isMobile = isMobileDevice();
+
+      // Add animation on scroll - Modified for mobile
       const observerOptions = {
-        threshold: 0.05, // Reduced threshold for mobile
-        rootMargin: '0px 0px -20px 0px', // Reduced margin for mobile
+        threshold: isMobile ? 0.01 : 0.05, // Much lower threshold for mobile
+        rootMargin: isMobile ? '50px 0px 50px 0px' : '0px 0px -20px 0px', // Larger margin for mobile
       };
 
       const observer = new IntersectionObserver((entries) => {
@@ -1377,34 +1387,41 @@
         });
       }, observerOptions);
 
-      // Observe all sections for animation
-      document.querySelectorAll('.section').forEach((section) => {
-        section.style.opacity = '0';
-        section.style.transform = 'translateY(20px)';
-        section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(section);
-      });
-
-      // Detect if user is on mobile device
-      function isMobileDevice() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-               (window.innerWidth <= 768);
+      // Setup sections for animation - Modified for mobile
+      function setupSectionAnimations() {
+        document.querySelectorAll('.section').forEach((section) => {
+          if (isMobile) {
+            // On mobile, show content immediately to avoid loading issues
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+            section.style.transition = 'none'; // Disable transitions on mobile
+          } else {
+            // Desktop: use normal animations
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+          }
+        });
       }
 
-      // Force load all content on mobile
+      // Force load all content on mobile - Simplified
       function forceLoadAllContent() {
+        if (!isMobile) return; // Only run on mobile
+
         // Force all sections to be visible
         const sections = document.querySelectorAll('.section');
-        sections.forEach(section => {
+        sections.forEach((section) => {
           section.style.opacity = '1';
           section.style.transform = 'translateY(0)';
           section.style.visibility = 'visible';
           section.style.display = 'block';
+          section.style.transition = 'none';
         });
 
         // Force all experience items to be visible
         const experienceItems = document.querySelectorAll('.experience-item');
-        experienceItems.forEach(item => {
+        experienceItems.forEach((item) => {
           item.style.opacity = '1';
           item.style.transform = 'translateY(0)';
           item.style.visibility = 'visible';
@@ -1413,50 +1430,42 @@
 
         // Force all projects to be visible
         const projects = document.querySelectorAll('.project');
-        projects.forEach(project => {
+        projects.forEach((project) => {
           project.style.opacity = '1';
           project.style.transform = 'translateY(0)';
           project.style.visibility = 'visible';
           project.style.display = 'block';
         });
-
-        // Force all other content to be visible
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach(element => {
-          const computedStyle = window.getComputedStyle(element);
-          if (computedStyle.display === 'none' && !element.classList.contains('print-loading')) {
-            element.style.display = 'block';
-          }
-        });
       }
 
       // Enhanced Auto-Print Resume Function with Mobile Support
       async function autoPrintResume() {
-        // Show loading indicator
+        const isMobile = isMobileDevice();
+        
+        // For mobile devices, provide alternative options
+        if (isMobile) {
+          showMobilePrintOptions();
+          return;
+        }
+
+        // Show loading indicator for desktop
         const loadingElement = document.getElementById('printLoading');
         const progressFill = document.getElementById('printProgressFill');
         loadingElement.style.display = 'block';
         document.body.style.overflow = 'hidden';
 
         try {
-          const isMobile = isMobileDevice();
-          
-          // Step 1: Force load all content immediately for mobile
-          if (isMobile) {
-            forceLoadAllContent();
-          }
-          
           // Reset scroll position
           window.scrollTo({ top: 0, behavior: 'instant' });
           progressFill.style.width = '10%';
-          await sleep(isMobile ? 500 : 300);
-
-          // Step 2: Force render all content by triggering reflow
-          document.body.offsetHeight; // Force reflow
-          progressFill.style.width = '15%';
           await sleep(200);
 
-          // Step 3: Get accurate document dimensions
+          // Force render all content by triggering reflow
+          document.body.offsetHeight;
+          progressFill.style.width = '20%';
+          await sleep(200);
+
+          // Get accurate document dimensions
           const body = document.body;
           const html = document.documentElement;
           const documentHeight = Math.max(
@@ -1468,168 +1477,67 @@
           );
 
           const viewportHeight = window.innerHeight;
-          
-          progressFill.style.width = '25%';
+          progressFill.style.width = '30%';
           await sleep(200);
 
-          // Step 4: Enhanced scrolling for mobile and desktop
-          if (isMobile) {
-            // More aggressive mobile handling
-            await scrollThroughContentMobileAggressive(documentHeight, viewportHeight, progressFill);
-          } else {
-            // Desktop handling
-            await scrollThroughContentDesktop(documentHeight, viewportHeight, progressFill);
-          }
+          // Desktop scrolling
+          await scrollThroughContentDesktop(
+            documentHeight,
+            viewportHeight,
+            progressFill
+          );
 
-          // Step 5: Ensure all sections are visible and loaded - Enhanced for mobile
-          const sections = document.querySelectorAll('.section');
-          for (let i = 0; i < sections.length; i++) {
-            const section = sections[i];
-            
-            // Force visibility
-            section.style.opacity = '1';
-            section.style.transform = 'translateY(0)';
-            section.style.visibility = 'visible';
-            section.style.display = 'block';
-            
-            // Scroll to section and force render
-            section.scrollIntoView({ behavior: 'instant', block: 'start' });
-            document.body.offsetHeight; // Force reflow
-            
-            if (isMobile) {
-              await sleep(400); // Longer delay for mobile
-            } else {
-              await sleep(100);
-            }
-            
-            // Update progress (70% to 85% during section loading)
-            const sectionProgress = 70 + (i / sections.length) * 15;
-            progressFill.style.width = sectionProgress + '%';
-          }
-
-          // Step 6: Mobile-specific content verification
-          if (isMobile) {
-            await verifyMobileContentLoaded();
-          }
-
-          // Step 7: Final scroll to top and ensure everything is rendered
+          // Final scroll to top
           window.scrollTo({ top: 0, behavior: 'instant' });
           progressFill.style.width = '90%';
-          await sleep(300);
+          await sleep(200);
 
-          // Step 8: Wait for any lazy-loaded content and images
+          // Wait for content to load
           await waitForContentToLoad();
           progressFill.style.width = '95%';
           await sleep(200);
 
-          // Step 9: Final preparation
+          // Final preparation
           await ensureAllContentVisible();
           progressFill.style.width = '100%';
-          await sleep(300);
+          await sleep(200);
 
-          // Step 10: Hide loading and trigger print
+          // Hide loading and trigger print
           loadingElement.style.display = 'none';
           document.body.style.overflow = 'auto';
 
-          // Trigger print with delay to ensure UI update
+          // Trigger print for desktop
           setTimeout(() => {
             window.print();
-          }, 150);
-
+          }, 100);
         } catch (error) {
           console.error('Error during auto-print preparation:', error);
           handlePrintError(loadingElement);
         }
       }
 
-      // More aggressive mobile scrolling function
-      async function scrollThroughContentMobileAggressive(documentHeight, viewportHeight, progressFill) {
-        // More scroll steps for mobile to ensure content loads
-        const scrollSteps = Math.max(12, Math.ceil(documentHeight / (viewportHeight * 0.6)));
-        
-        for (let i = 0; i <= scrollSteps; i++) {
-          const scrollPosition = Math.min(
-            (i / scrollSteps) * (documentHeight - viewportHeight),
-            documentHeight - viewportHeight
-          );
-          
-          // Use instant scroll for mobile to avoid animation issues
-          window.scrollTo({ top: scrollPosition, behavior: 'instant' });
-          
-          // Force all content to be visible at current position
-          forceLoadAllContent();
-          
-          // Multiple reflows to ensure content loads
-          document.body.offsetHeight;
-          document.documentElement.offsetHeight;
-          
-          // Update progress (25% to 70% during scrolling)
-          const scrollProgress = 25 + (i / scrollSteps) * 45;
-          progressFill.style.width = scrollProgress + '%';
-          
-          // Longer delay for mobile to ensure content loads
-          await sleep(350);
-        }
-
-        // Additional pass through sections
-        const sections = document.querySelectorAll('.section');
-        for (let section of sections) {
-          section.scrollIntoView({ behavior: 'instant', block: 'center' });
-          forceLoadAllContent();
-          document.body.offsetHeight;
-          await sleep(200);
-        }
-      }
-
       // Desktop-specific scrolling function
-      async function scrollThroughContentDesktop(documentHeight, viewportHeight, progressFill) {
+      async function scrollThroughContentDesktop(
+        documentHeight,
+        viewportHeight,
+        progressFill
+      ) {
         const scrollSteps = Math.ceil(documentHeight / viewportHeight);
-        
+
         for (let i = 0; i <= scrollSteps; i++) {
           const scrollPosition = Math.min(
             (i / scrollSteps) * (documentHeight - viewportHeight),
             documentHeight - viewportHeight
           );
-          
+
           window.scrollTo({ top: scrollPosition, behavior: 'instant' });
-          
-          // Update progress (25% to 70% during scrolling)
-          const scrollProgress = 25 + (i / scrollSteps) * 45;
+
+          // Update progress (30% to 80% during scrolling)
+          const scrollProgress = 30 + (i / scrollSteps) * 50;
           progressFill.style.width = scrollProgress + '%';
-          
-          await sleep(200);
+
+          await sleep(150);
         }
-      }
-
-      // Verify mobile content loaded
-      async function verifyMobileContentLoaded() {
-        // Check if all major sections are visible
-        const criticalElements = [
-          '.section',
-          '.experience-item',
-          '.project',
-          '.skill-category',
-          '.cert-item'
-        ];
-
-        for (let selector of criticalElements) {
-          const elements = document.querySelectorAll(selector);
-          elements.forEach(element => {
-            const rect = element.getBoundingClientRect();
-            const computedStyle = window.getComputedStyle(element);
-            
-            // Force visibility if not visible
-            if (computedStyle.opacity === '0' || computedStyle.visibility === 'hidden' || computedStyle.display === 'none') {
-              element.style.opacity = '1';
-              element.style.visibility = 'visible';
-              element.style.display = 'block';
-              element.style.transform = 'translateY(0)';
-            }
-          });
-        }
-
-        // Additional wait for mobile rendering
-        await sleep(500);
       }
 
       // Enhanced content loading function
@@ -1661,25 +1569,22 @@
             }
           });
 
-          // Shorter timeout for mobile
-          setTimeout(resolve, isMobileDevice() ? 1500 : 2000);
+          // Timeout for desktop
+          setTimeout(resolve, 1000);
         });
       }
 
-      // Ensure all content is visible
+      // Simplified ensure all content is visible
       async function ensureAllContentVisible() {
         // Force all lazy-loaded content to be visible
         const lazyElements = document.querySelectorAll('[loading="lazy"]');
-        lazyElements.forEach(element => {
+        lazyElements.forEach((element) => {
           element.removeAttribute('loading');
         });
 
-        // Force all content to be visible one final time
-        forceLoadAllContent();
-
-        // Trigger any remaining animations or transitions
+        // For desktop, ensure all animations are complete
         const animatedElements = document.querySelectorAll('.section, .experience-item, .project');
-        animatedElements.forEach(element => {
+        animatedElements.forEach((element) => {
           element.style.opacity = '1';
           element.style.transform = 'translateY(0)';
           element.style.visibility = 'visible';
@@ -1688,41 +1593,221 @@
 
         // Final reflow
         document.body.offsetHeight;
-        
+
         // Wait for any remaining renders
-        await sleep(isMobileDevice() ? 400 : 200);
+        await sleep(100);
       }
 
       // Error handling function
       function handlePrintError(loadingElement) {
         loadingElement.style.display = 'none';
         document.body.style.overflow = 'auto';
-        
-        // Force load all content even on error
-        forceLoadAllContent();
-        
+
         // Show user-friendly message
         alert('Print preparation encountered an issue. Opening print dialog directly...');
-        
+
         // Fallback to direct print
         setTimeout(() => {
           window.print();
         }, 100);
       }
 
+      // Mobile print options function
+      function showMobilePrintOptions() {
+        const options = [
+          'Share this page and select "Print" from share options',
+          'Use browser menu → Print/Save as PDF',
+          'Screenshot the page in sections',
+          'Open in desktop browser for better print support'
+        ];
+
+        const userAgent = navigator.userAgent.toLowerCase();
+        let specificInstructions = '';
+
+        if (userAgent.includes('chrome')) {
+          specificInstructions = '\n\nFor Chrome Mobile:\n1. Tap ⋮ (three dots)\n2. Select "Share..."\n3. Choose "Print" or "Save to Drive"';
+        } else if (userAgent.includes('safari')) {
+          specificInstructions = '\n\nFor Safari Mobile:\n1. Tap the Share button\n2. Scroll down and tap "Print"\n3. Use pinch to zoom for preview';
+        } else if (userAgent.includes('firefox')) {
+          specificInstructions = '\n\nFor Firefox Mobile:\n1. Tap ⋮ (three dots)\n2. Select "Page"\n3. Choose "Print"';
+        }
+
+        // Try native print first, with fallback to instructions
+        try {
+          // Ensure all content is visible for mobile print
+          forceLoadAllContent();
+          
+          // Small delay to ensure content is loaded
+          setTimeout(() => {
+            if (window.print) {
+              window.print();
+            } else {
+              // Show instructions if print not available
+              alert(`Print options for mobile:\n\n${options.join('\n')}\n${specificInstructions}`);
+            }
+          }, 500);
+        } catch (error) {
+          // Fallback to instructions
+          alert(`Print options for mobile:\n\n${options.join('\n')}\n${specificInstructions}`);
+        }
+      }
+
+      // Enhanced mobile print with better support
+      function mobilePrintFallback() {
+        // Ensure all content is visible
+        forceLoadAllContent();
+        
+        // Remove animations and transitions for print
+        const style = document.createElement('style');
+        style.textContent = `
+          * {
+            animation: none !important;
+            transition: none !important;
+            transform: none !important;
+          }
+          .section {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+          }
+        `;
+        document.head.appendChild(style);
+
+        // Try different print methods
+        setTimeout(() => {
+          try {
+            // Method 1: Standard print
+            if (window.print && typeof window.print === 'function') {
+              window.print();
+              return;
+            }
+
+            // Method 2: execCommand print (older browsers)
+            if (document.execCommand) {
+              document.execCommand('print', false, null);
+              return;
+            }
+
+            // Method 3: Create print-friendly version
+            createPrintVersion();
+          } catch (error) {
+            console.log('Print methods failed, showing instructions');
+            showMobilePrintInstructions();
+          }
+        }, 1000);
+      }
+
+      // Create a print-friendly version for mobile
+      function createPrintVersion() {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          const htmlContent = document.documentElement.outerHTML;
+          printWindow.document.write(htmlContent);
+          printWindow.document.close();
+          
+          // Focus the new window and try to print
+          printWindow.focus();
+          setTimeout(() => {
+            try {
+              printWindow.print();
+            } catch (error) {
+              printWindow.close();
+              showMobilePrintInstructions();
+            }
+          }, 1000);
+        } else {
+          showMobilePrintInstructions();
+        }
+      }
+
+      // Show detailed mobile print instructions
+      function showMobilePrintInstructions() {
+        const instructionsHTML = `
+          <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 90%; max-height: 90%; overflow-y: auto;">
+              <h3 style="color: #2c3e50; margin-bottom: 20px;">📱 Mobile Print Instructions</h3>
+              
+              <div style="margin-bottom: 20px;">
+                <h4 style="color: #3498db;">Method 1: Browser Menu</h4>
+                <p>• Tap your browser's menu (⋮ or ⋯)</p>
+                <p>• Look for "Print", "Share", or "Save as PDF"</p>
+                <p>• Select your preferred option</p>
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <h4 style="color: #3498db;">Method 2: Share Options</h4>
+                <p>• Use your device's share button</p>
+                <p>• Look for "Print" in the share menu</p>
+                <p>• Or save to cloud storage for later printing</p>
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <h4 style="color: #3498db;">Method 3: Screenshot</h4>
+                <p>• Take screenshots of each section</p>
+                <p>• Combine them into a document</p>
+                <p>• Print from your photo gallery</p>
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <h4 style="color: #3498db;">Best Option:</h4>
+                <p style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                  <strong>Open on Desktop/Laptop</strong><br>
+                  Copy this URL and open it on a computer for the best printing experience with our optimized print feature.
+                </p>
+              </div>
+
+              <button onclick="this.parentElement.parentElement.remove()" 
+                      style="background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-size: 16px; cursor: pointer; width: 100%;">
+                Got it! ✓
+              </button>
+            </div>
+          </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', instructionsHTML);
+      }
+
+      // Update the print button click handler - Fixed
+      document.addEventListener('DOMContentLoaded', function() {
+        const printButton = document.querySelector('.print-btn');
+        if (printButton) {
+          printButton.onclick = function() {
+            if (isMobileDevice()) {
+              // For mobile, try enhanced print with fallbacks
+              mobilePrintFallback();
+            } else {
+              // For desktop, use the enhanced auto-print
+              autoPrintResume();
+            }
+          };
+        }
+      });
+
       // Helper function to create delays
       function sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
-      // Add window load event to ensure everything is ready
-      window.addEventListener('load', function() {
-        // Force all content to be visible after page load
-        setTimeout(() => {
-          if (isMobileDevice()) {
+      // Initialize on page load
+      document.addEventListener('DOMContentLoaded', function () {
+        // Setup animations based on device type
+        setupSectionAnimations();
+
+        // For mobile, ensure content is visible after a short delay
+        if (isMobile) {
+          setTimeout(() => {
             forceLoadAllContent();
-          }
-        }, 1000);
+          }, 500);
+        }
+      });
+
+      // Add window load event to ensure everything is ready
+      window.addEventListener('load', function () {
+        // Force all content to be visible after page load on mobile
+        if (isMobile) {
+          setTimeout(() => {
+            forceLoadAllContent();
+          }, 200);
+        }
       });
     </script>
   </body>
