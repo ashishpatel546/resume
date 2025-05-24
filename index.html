@@ -418,9 +418,10 @@
           <h2 class="section-title">🎯 Professional Summary</h2>
           <div class="summary">
             <strong>Technical Leader & Senior AI Engineer</strong> with
-            <strong>5.5+ years</strong> of proven expertise in architecting and
-            delivering enterprise-scale solutions across backend development,
-            artificial intelligence, and system integration. Currently leading
+            <strong><span id="experience-years">5.5+ years</span></strong> of
+            proven expertise in architecting and delivering enterprise-scale
+            solutions across backend development, artificial intelligence, and
+            system integration. Currently leading
             <strong>4 major technical initiatives</strong> at Blink Charging
             including EV CRM with Salesforce integration, ETL data pipelines,
             real-time WebSocket communication systems, and cutting-edge AI
@@ -1083,6 +1084,42 @@
     </div>
 
     <script>
+      // Function to calculate experience dynamically
+      function calculateExperience() {
+        const startDate = new Date('2019-06-01'); // June 1, 2019 - Start of IT career
+        const currentDate = new Date();
+
+        // Calculate the difference in years
+        const diffTime = currentDate - startDate;
+        const diffYears = diffTime / (1000 * 60 * 60 * 24 * 365.25); // Account for leap years
+
+        // Format the experience based on rounding logic
+        const years = Math.floor(diffYears);
+        const months = Math.floor((diffYears - years) * 12);
+
+        let experienceText;
+
+        if (months >= 0 && months <= 3) {
+          // 0-3 months: Show as "X+ years"
+          experienceText = `${years}+ years`;
+        } else if (months >= 4 && months <= 8) {
+          // 4-8 months: Show as "approx X.5 years"
+          experienceText = `approx ${years}.5 years`;
+        } else {
+          // 9+ months: Show as "approx (X+1) years" (round up to next year)
+          experienceText = `approx ${years + 1} years`;
+        }
+
+        // Update the experience in the DOM
+        const experienceElement = document.getElementById('experience-years');
+        if (experienceElement) {
+          experienceElement.textContent = experienceText;
+        }
+      }
+
+      // Calculate experience when page loads
+      document.addEventListener('DOMContentLoaded', calculateExperience);
+
       // Add smooth scrolling
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         anchor.addEventListener('click', function (e) {
