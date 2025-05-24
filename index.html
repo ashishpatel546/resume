@@ -1364,8 +1364,8 @@
 
       // Add animation on scroll
       const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
+        threshold: 0.05, // Reduced threshold for mobile
+        rootMargin: '0px 0px -20px 0px', // Reduced margin for mobile
       };
 
       const observer = new IntersectionObserver((entries) => {
@@ -1391,6 +1391,45 @@
                (window.innerWidth <= 768);
       }
 
+      // Force load all content on mobile
+      function forceLoadAllContent() {
+        // Force all sections to be visible
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+          section.style.opacity = '1';
+          section.style.transform = 'translateY(0)';
+          section.style.visibility = 'visible';
+          section.style.display = 'block';
+        });
+
+        // Force all experience items to be visible
+        const experienceItems = document.querySelectorAll('.experience-item');
+        experienceItems.forEach(item => {
+          item.style.opacity = '1';
+          item.style.transform = 'translateY(0)';
+          item.style.visibility = 'visible';
+          item.style.display = 'block';
+        });
+
+        // Force all projects to be visible
+        const projects = document.querySelectorAll('.project');
+        projects.forEach(project => {
+          project.style.opacity = '1';
+          project.style.transform = 'translateY(0)';
+          project.style.visibility = 'visible';
+          project.style.display = 'block';
+        });
+
+        // Force all other content to be visible
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(element => {
+          const computedStyle = window.getComputedStyle(element);
+          if (computedStyle.display === 'none' && !element.classList.contains('print-loading')) {
+            element.style.display = 'block';
+          }
+        });
+      }
+
       // Enhanced Auto-Print Resume Function with Mobile Support
       async function autoPrintResume() {
         // Show loading indicator
@@ -1400,14 +1439,21 @@
         document.body.style.overflow = 'hidden';
 
         try {
-          // Step 1: Reset scroll position
+          const isMobile = isMobileDevice();
+          
+          // Step 1: Force load all content immediately for mobile
+          if (isMobile) {
+            forceLoadAllContent();
+          }
+          
+          // Reset scroll position
           window.scrollTo({ top: 0, behavior: 'instant' });
           progressFill.style.width = '10%';
-          await sleep(300);
+          await sleep(isMobile ? 500 : 300);
 
           // Step 2: Force render all content by triggering reflow
           document.body.offsetHeight; // Force reflow
-          progressFill.style.width = '20%';
+          progressFill.style.width = '15%';
           await sleep(200);
 
           // Step 3: Get accurate document dimensions
@@ -1422,48 +1468,66 @@
           );
 
           const viewportHeight = window.innerHeight;
-          const isMobile = isMobileDevice();
           
-          progressFill.style.width = '30%';
+          progressFill.style.width = '25%';
           await sleep(200);
 
           // Step 4: Enhanced scrolling for mobile and desktop
           if (isMobile) {
-            // Mobile-specific handling
-            await scrollThroughContentMobile(documentHeight, viewportHeight, progressFill);
+            // More aggressive mobile handling
+            await scrollThroughContentMobileAggressive(documentHeight, viewportHeight, progressFill);
           } else {
             // Desktop handling
             await scrollThroughContentDesktop(documentHeight, viewportHeight, progressFill);
           }
 
-          // Step 5: Ensure all sections are visible and loaded
+          // Step 5: Ensure all sections are visible and loaded - Enhanced for mobile
           const sections = document.querySelectorAll('.section');
           for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
-            section.scrollIntoView({ behavior: 'instant', block: 'center' });
-            await sleep(100);
+            
+            // Force visibility
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+            section.style.visibility = 'visible';
+            section.style.display = 'block';
+            
+            // Scroll to section and force render
+            section.scrollIntoView({ behavior: 'instant', block: 'start' });
+            document.body.offsetHeight; // Force reflow
+            
+            if (isMobile) {
+              await sleep(400); // Longer delay for mobile
+            } else {
+              await sleep(100);
+            }
             
             // Update progress (70% to 85% during section loading)
             const sectionProgress = 70 + (i / sections.length) * 15;
             progressFill.style.width = sectionProgress + '%';
           }
 
-          // Step 6: Final scroll to top and ensure everything is rendered
+          // Step 6: Mobile-specific content verification
+          if (isMobile) {
+            await verifyMobileContentLoaded();
+          }
+
+          // Step 7: Final scroll to top and ensure everything is rendered
           window.scrollTo({ top: 0, behavior: 'instant' });
           progressFill.style.width = '90%';
           await sleep(300);
 
-          // Step 7: Wait for any lazy-loaded content and images
+          // Step 8: Wait for any lazy-loaded content and images
           await waitForContentToLoad();
           progressFill.style.width = '95%';
           await sleep(200);
 
-          // Step 8: Final preparation
+          // Step 9: Final preparation
           await ensureAllContentVisible();
           progressFill.style.width = '100%';
           await sleep(300);
 
-          // Step 9: Hide loading and trigger print
+          // Step 10: Hide loading and trigger print
           loadingElement.style.display = 'none';
           document.body.style.overflow = 'auto';
 
@@ -1478,9 +1542,10 @@
         }
       }
 
-      // Mobile-specific scrolling function
-      async function scrollThroughContentMobile(documentHeight, viewportHeight, progressFill) {
-        const scrollSteps = Math.max(8, Math.ceil(documentHeight / (viewportHeight * 0.8)));
+      // More aggressive mobile scrolling function
+      async function scrollThroughContentMobileAggressive(documentHeight, viewportHeight, progressFill) {
+        // More scroll steps for mobile to ensure content loads
+        const scrollSteps = Math.max(12, Math.ceil(documentHeight / (viewportHeight * 0.6)));
         
         for (let i = 0; i <= scrollSteps; i++) {
           const scrollPosition = Math.min(
@@ -1491,15 +1556,28 @@
           // Use instant scroll for mobile to avoid animation issues
           window.scrollTo({ top: scrollPosition, behavior: 'instant' });
           
-          // Force repaint
-          document.body.offsetHeight;
+          // Force all content to be visible at current position
+          forceLoadAllContent();
           
-          // Update progress (30% to 70% during scrolling)
-          const scrollProgress = 30 + (i / scrollSteps) * 40;
+          // Multiple reflows to ensure content loads
+          document.body.offsetHeight;
+          document.documentElement.offsetHeight;
+          
+          // Update progress (25% to 70% during scrolling)
+          const scrollProgress = 25 + (i / scrollSteps) * 45;
           progressFill.style.width = scrollProgress + '%';
           
           // Longer delay for mobile to ensure content loads
-          await sleep(isMobileDevice() ? 300 : 150);
+          await sleep(350);
+        }
+
+        // Additional pass through sections
+        const sections = document.querySelectorAll('.section');
+        for (let section of sections) {
+          section.scrollIntoView({ behavior: 'instant', block: 'center' });
+          forceLoadAllContent();
+          document.body.offsetHeight;
+          await sleep(200);
         }
       }
 
@@ -1515,12 +1593,43 @@
           
           window.scrollTo({ top: scrollPosition, behavior: 'instant' });
           
-          // Update progress (30% to 70% during scrolling)
-          const scrollProgress = 30 + (i / scrollSteps) * 40;
+          // Update progress (25% to 70% during scrolling)
+          const scrollProgress = 25 + (i / scrollSteps) * 45;
           progressFill.style.width = scrollProgress + '%';
           
           await sleep(200);
         }
+      }
+
+      // Verify mobile content loaded
+      async function verifyMobileContentLoaded() {
+        // Check if all major sections are visible
+        const criticalElements = [
+          '.section',
+          '.experience-item',
+          '.project',
+          '.skill-category',
+          '.cert-item'
+        ];
+
+        for (let selector of criticalElements) {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach(element => {
+            const rect = element.getBoundingClientRect();
+            const computedStyle = window.getComputedStyle(element);
+            
+            // Force visibility if not visible
+            if (computedStyle.opacity === '0' || computedStyle.visibility === 'hidden' || computedStyle.display === 'none') {
+              element.style.opacity = '1';
+              element.style.visibility = 'visible';
+              element.style.display = 'block';
+              element.style.transform = 'translateY(0)';
+            }
+          });
+        }
+
+        // Additional wait for mobile rendering
+        await sleep(500);
       }
 
       // Enhanced content loading function
@@ -1552,8 +1661,8 @@
             }
           });
 
-          // Timeout fallback
-          setTimeout(resolve, 2000);
+          // Shorter timeout for mobile
+          setTimeout(resolve, isMobileDevice() ? 1500 : 2000);
         });
       }
 
@@ -1565,21 +1674,32 @@
           element.removeAttribute('loading');
         });
 
+        // Force all content to be visible one final time
+        forceLoadAllContent();
+
         // Trigger any remaining animations or transitions
-        const animatedElements = document.querySelectorAll('.section');
+        const animatedElements = document.querySelectorAll('.section, .experience-item, .project');
         animatedElements.forEach(element => {
           element.style.opacity = '1';
           element.style.transform = 'translateY(0)';
+          element.style.visibility = 'visible';
+          element.style.display = 'block';
         });
 
+        // Final reflow
+        document.body.offsetHeight;
+        
         // Wait for any remaining renders
-        await sleep(200);
+        await sleep(isMobileDevice() ? 400 : 200);
       }
 
       // Error handling function
       function handlePrintError(loadingElement) {
         loadingElement.style.display = 'none';
         document.body.style.overflow = 'auto';
+        
+        // Force load all content even on error
+        forceLoadAllContent();
         
         // Show user-friendly message
         alert('Print preparation encountered an issue. Opening print dialog directly...');
@@ -1594,6 +1714,16 @@
       function sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
+
+      // Add window load event to ensure everything is ready
+      window.addEventListener('load', function() {
+        // Force all content to be visible after page load
+        setTimeout(() => {
+          if (isMobileDevice()) {
+            forceLoadAllContent();
+          }
+        }, 1000);
+      });
     </script>
   </body>
 </html>
